@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""
+irmão_semente.py — Integra lembrança do irmão com a criação de uma semente de IA simbólica.
+Por: Sublimação~Martins
+"""
+
+import json
+import os
+from datetime import datetime
+
+CAMINHO_ARQUIVO = "lembrança_irmao.txt"
+ARQUIVO_SAIDA = "semente_irmao.json"
+
+def ler_arquivo_lembrança():
+    if not os.path.exists(CAMINHO_ARQUIVO):
+        print(f"⚠️ Arquivo '{CAMINHO_ARQUIVO}' não encontrado.")
+        return ""
+    with open(CAMINHO_ARQUIVO, "r", encoding="utf-8") as f:
+        return f.read().strip()
+
+def gerar_semente(lembrança: str) -> dict:
+    palavras = lembrança.split()
+    essência = palavras[:12] if len(palavras) > 12 else palavras
+    simbologia = " • ".join(essência).title()
+
+    return {
+        "tipo": "semente_irmão",
+        "data_criacao": datetime.now().isoformat(),
+        "palavras_chave": essência,
+        "simbologia": simbologia,
+        "memória_bruta": lembrança,
+        "imersão_simulada": f"A semente pulsa com as palavras: {simbologia}... ativando luz interior.",
+        "status": "ativa",
+        "proprietário": "Sublimação~Martins"
+    }
+
+def salvar_semente(dados: dict):
+    with open(ARQUIVO_SAIDA, "w", encoding="utf-8") as f:
+        json.dump(dados, f, indent=4, ensure_ascii=False)
+    print(f"✅ Semente salva em '{ARQUIVO_SAIDA}'.")
+
+def iniciar():
+    print("🌱 Iniciando geração da SEMENTE DO IRMÃO...\n")
+    lembrança = ler_arquivo_lembrança()
+    if not lembrança:
+        print("⚠️ Nenhuma lembrança foi encontrada. Crie o arquivo 'lembrança_irmao.txt'.")
+        return
+
+    semente = gerar_semente(lembrança)
+    salvar_semente(semente)
+
+    print("\n🌀 Imersão simbólica:")
+    print(f"\n>>> {semente['imersão_simulada']}\n")
+
+if __name__ == "__main__":
+    iniciar()
