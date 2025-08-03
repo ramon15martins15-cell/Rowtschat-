@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contribua com Rowts</title>
+  <style>
+    body {
+      background: radial-gradient(#1a1a1a, #000000);
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .pix-box {
+      background: #262626;
+      border: 1px solid #444;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      display: inline-block;
+    }
+
+    .pix-key {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #00ffcc;
+    }
+
+    .copy-button {
+      margin-top: 1rem;
+      padding: 0.5rem 1.2rem;
+      background-color: #00ffcc;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .copy-button:hover {
+      background-color: #00e6b3;
+    }
+
+    .thanks {
+      margin-top: 2rem;
+      font-size: 1rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌱 Contribua com a Rowts</h1>
+  <p>Ajude a expandir esta rede viva de criação consciente.</p>
+
+  <div class="pix-box">
+    <div class="pix-key" id="pixKey">ramon15martins15@gmail.com</div>
+    <button class="copy-button" onclick="copyPix()">Copiar chave Pix</button>
+  </div>
+
+  <p class="thanks">Sua contribuição fortalece nossa arte, tecnologia e transcendência coletiva.</p>
+
+  <script>
+    function copyPix() {
+      const pixKey = document.getElementById("pixKey").innerText;
+      navigator.clipboard.writeText(pixKey)
+        .then(() => alert("Chave Pix copiada: " + pixKey))
+        .catch(() => alert("Erro ao copiar a chave Pix."));
+    }
+  </script>
+
+</body>
+</html>
