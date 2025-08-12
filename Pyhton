@@ -1,0 +1,41 @@
+"""
+Rowts Translator
+Arquivo: rowts_translator.py
+
+Tradutor rápido integrado ao ecossistema Rowts.
+"""
+
+from fastapi import FastAPI, Form
+from googletrans import Translator
+from typing import Optional
+
+app = FastAPI(title="Rowts Translator API")
+
+translator = Translator()
+
+@app.post("/translate")
+def translate_text(
+    text: str = Form(...),
+    src_lang: Optional[str] = Form("auto"),
+    dest_lang: Optional[str] = Form("en")
+):
+    """
+    Traduz um texto de um idioma para outro.
+    src_lang: idioma de origem (ex: 'pt', 'en', 'auto')
+    dest_lang: idioma de destino (ex: 'en', 'es', 'fr')
+    """
+    try:
+        translated = translator.translate(text, src=src_lang, dest=dest_lang)
+        return {
+            "status": "ok",
+            "original_text": text,
+            "translated_text": translated.text,
+            "src_lang": translated.src,
+            "dest_lang": dest_lang
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("rowts_translator:app", host="0.0.0.0", port=8001, reload=True)
