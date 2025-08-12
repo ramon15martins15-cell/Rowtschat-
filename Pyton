@@ -1,0 +1,135 @@
+"""
+Rowts Virtual World Entry
+Arquivo: rowts_entry.py
+
+Porta de entrada do mundo virtual Rowts.
+Inclui:
+ - Dados centrais Rowts
+ - Experiência inicial (UOPS) gratuita
+ - Geração da semente de luz personalizada (IMU)
+ - Integração de pagamento para publicação/contribuição
+ - Pontos de expansão para Wox, OCUS e OUX
+"""
+
+from fastapi import FastAPI, Form
+from typing import Optional, Dict, Any
+import uuid
+import os
+
+# ===================================
+# Configuração Rowts (dados fixos)
+# ===================================
+class RowtsConfig:
+    OWNER_NAME = "Ramon Martins dos Reis"
+    OWNER_EMAIL = "ramon15martins15@gmail.com"
+    PIX_CPF = "021587776-48"
+    PAYPAL_EMAIL = "ramon15martins15@gmail.com"
+    STRIPE_API_KEY = os.getenv("STRIPE_API_KEY", "CHAVE_TESTE")
+    BRAND_NAME = "Rowts"
+    SUB_BRANDS = ["UOPS", "Wox", "OCUS", "OUX", "Sublimação~Martins"]
+
+    DATA_DIR = "./rowts_data"
+    IMAGE_DIR = f"{DATA_DIR}/images"
+    SOUND_DIR = f"{DATA_DIR}/sounds"
+
+# Criar pastas necessárias
+for path in [RowtsConfig.DATA_DIR, RowtsConfig.IMAGE_DIR, RowtsConfig.SOUND_DIR]:
+    os.makedirs(path, exist_ok=True)
+
+# ===================================
+# Funções utilitárias
+# ===================================
+def generate_id(prefix="obj"):
+    return f"{prefix}_{uuid.uuid4().hex[:10]}"
+
+# ===================================
+# Simulação de serviços internos
+# ===================================
+class ImageService:
+    @staticmethod
+    def generate_image(prompt: str, style: str = "transcendental") -> Dict[str, Any]:
+        img_id = generate_id("img")
+        file_path = f"{RowtsConfig.IMAGE_DIR}/{img_id}.png"
+        # No real: gerar imagem via IA; aqui criamos um arquivo placeholder
+        with open(file_path, "wb") as f:
+            f.write(b"PNG_PLACEHOLDER")
+        return {"id": img_id, "prompt": prompt, "style": style, "file_path": file_path}
+
+class PaymentService:
+    @staticmethod
+    def pix_payment(amount: float) -> Dict[str, Any]:
+        return {
+            "status": "pending",
+            "method": "pix",
+            "amount": amount,
+            "cpf": RowtsConfig.PIX_CPF,
+            "nome": RowtsConfig.OWNER_NAME
+        }
+
+# ===================================
+# Inicialização FastAPI
+# ===================================
+app = FastAPI(title="Rowts Virtual World Entry")
+
+# Banco de dados temporário (memória)
+DB = {"users": {}, "experiences": {}}
+
+# ===================================
+# Endpoints
+# ===================================
+@app.post("/enter")
+def enter_virtual_world(name: Optional[str] = Form(None), email: Optional[str] = Form(None)):
+    """Entrada no mundo Rowts — cria perfil do visitante."""
+    user_id = generate_id("user")
+    DB["users"][user_id] = {"id": user_id, "name": name, "email": email}
+    # Primeira experiência gratuita
+    image = ImageService.generate_image(
+        prompt=f"Semente de luz inicial para {name or 'visitante'}",
+        style="cura_emocional_transcendental"
+    )
+    DB["experiences"][user_id] = {"free_image": image}
+    return {
+        "status": "ok",
+        "message": f"Bem-vindo(a) ao mundo virtual Rowts, {name or 'visitante'}!",
+        "user_id": user_id,
+        "free_experience": image
+    }
+
+@app.get("/seed/{user_id}")
+def get_seed(user_id: str):
+    """Gera semente personalizada IMU para o visitante."""
+    if user_id not in DB["users"]:
+        return {"status": "error", "message": "Usuário não encontrado"}
+    seed_image = ImageService.generate_image(
+        prompt=f"Semente personalizada para {DB['users'][user_id]['name'] or 'visitante'}",
+        style="transcendental_psicodelico"
+    )
+    return {"status": "ok", "seed": seed_image}
+
+@app.post("/publish/{user_id}")
+def publish_art(user_id: str, amount: float = Form(2.0)):
+    """Publicar arte própria (pagamento via Pix)."""
+    if user_id not in DB["users"]:
+        return {"status": "error", "message": "Usuário não encontrado"}
+    payment = PaymentService.pix_payment(amount)
+    return {
+        "status": "pending_payment",
+        "instructions": payment,
+        "message": "Pague para concluir a publicação."
+    }
+
+@app.get("/brand")
+def get_brand_info():
+    """Retorna informações da marca Rowts."""
+    return {
+        "brand": RowtsConfig.BRAND_NAME,
+        "sub_brands": RowtsConfig.SUB_BRANDS,
+        "contact_email": RowtsConfig.OWNER_EMAIL
+    }
+
+# ===================================
+# Execução local
+# ===================================
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("rowts_entry:app", host="0.0.0.0", port=8000, reload=True)
